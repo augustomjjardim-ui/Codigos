@@ -35,6 +35,13 @@ def mostrar_mao(mao):
     return [formatar_carta(c) for c in mao]
 
 
+def mostrar_trincas(trincas):
+    return [
+        [formatar_carta(carta) for carta in trinca]
+        for trinca in trincas
+    ]
+
+
 def extrair_trincas(mao, trincas_guardadas):
     contagem = {}
 
@@ -50,32 +57,23 @@ def extrair_trincas(mao, trincas_guardadas):
                 mao.remove(carta)
 
             trincas_guardadas.append(trinca)
-
             cartas = cartas[3:]
 
 
-def mostrar_trincas(trincas):
-    return [
-        [formatar_carta(carta) for carta in trinca]
-        for trinca in trincas
-    ]
+def mostrar_estado_privado(mao, trincas, mao_oponente, trincas_oponente, pilha):
+    print("=== SEU ESTADO ===\n")
 
+    print("Sua mão:")
+    print(mostrar_mao(mao))
 
-def mostrar_estado(mao1, mao2, trincas1, trincas2, pilha):
-    print("=== ESTADO DO JOGO ===\n")
+    print("\nSuas trincas:")
+    print(mostrar_trincas(trincas))
 
-    print("Jogador 1:")
-    print("Mão:", mostrar_mao(mao1))
-    print("Trincas:", mostrar_trincas(trincas1))
+    print("\n=== OPONENTE ===")
+    print("Cartas na mão:", len(mao_oponente))
+    print("Trincas formadas:", len(trincas_oponente))
 
-    print()
-
-    print("Jogador 2:")
-    print("Mão:", mostrar_mao(mao2))
-    print("Trincas:", mostrar_trincas(trincas2))
-
-    print()
-
+    print("\n=== PILHA ===")
     if pilha:
         print("Carta da pilha:", formatar_carta(pilha[-1]))
     else:
@@ -111,12 +109,29 @@ turno = 1
 while True:
     limpar()
 
+    input(f"Jogador {turno}, pressione Enter quando estiver pronto para ver sua mão...")
+    limpar()
+
+    if turno == 1:
+        mao = mao1
+        trincas = trincas1
+        mao_oponente = mao2
+        trincas_oponente = trincas2
+    else:
+        mao = mao2
+        trincas = trincas2
+        mao_oponente = mao1
+        trincas_oponente = trincas1
+
     print(f"=== TURNO DO JOGADOR {turno} ===\n")
 
-    mostrar_estado(mao1, mao2, trincas1, trincas2, pilha)
-
-    mao = mao1 if turno == 1 else mao2
-    trincas = trincas1 if turno == 1 else trincas2
+    mostrar_estado_privado(
+        mao,
+        trincas,
+        mao_oponente,
+        trincas_oponente,
+        pilha
+    )
 
     print("1 - Comprar do baralho")
     print("2 - Pegar da pilha")
@@ -129,8 +144,7 @@ while True:
             input("Pressione Enter...")
             break
 
-        carta = baralho.pop()
-        mao.append(carta)
+        mao.append(baralho.pop())
 
     elif escolha == "2":
         if not pilha:
@@ -138,25 +152,23 @@ while True:
             input("Pressione Enter...")
             continue
 
-        carta = pilha.pop()
-        mao.append(carta)
+        mao.append(pilha.pop())
 
     else:
         print("\nJogada inválida!")
         input("Pressione Enter...")
         continue
 
-    # FORMAR TRINCAS AUTOMATICAMENTE
+    # Formar trincas automaticamente
     extrair_trincas(mao, trincas)
 
-    # DESCARTE OBRIGATÓRIO
+    # Descarte obrigatório
     limpar()
-
     print(f"=== DESCARTE - JOGADOR {turno} ===\n")
 
     print("Sua mão:")
     for i, carta in enumerate(mao):
-        print(f"{i+1} - {formatar_carta(carta)}")
+        print(f"{i + 1} - {formatar_carta(carta)}")
 
     while True:
         try:
@@ -172,9 +184,12 @@ while True:
         except ValueError:
             print("Entrada inválida.")
 
-    # VERIFICAR VITÓRIA
+    # Verificar vitória
     if len(trincas1) >= 3 or len(trincas2) >= 3:
         break
+
+    limpar()
+    input("Passe o computador para o próximo jogador e pressione Enter...")
 
     turno = 2 if turno == 1 else 1
 
