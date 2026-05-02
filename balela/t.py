@@ -4,4 +4,4 @@ num = int(input("Digite um número: "))
 while contador <= 10:
     result=num*contador
     print(f"{num} X {contador} = {result}")
-    contador=contador+1
+    contador+=1
